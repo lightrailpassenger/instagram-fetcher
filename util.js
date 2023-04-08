@@ -69,11 +69,16 @@ const getImageSrcFromUrl = async (postUrl) => {
 
                 return largest.src;
             };
-            const srcs = allImages.flatMap(({ srcset }) => (
-                srcset ? [parseSrcset(srcset)] : []
+            const imageSrcs = allImages.flatMap(({ srcset }) => (
+                srcset ? [{ type: 'jpg', src: parseSrcset(srcset) }] : []
             ));
 
-            return srcs;
+            const allVideos = Array.from(document.getElementsByTagName('video'));
+            const videoSrcs = allVideos.flatMap(({ src }) => (
+                src ? [{ type: 'mp4', src }] : []
+            ));
+
+            return [...videoSrcs, ...imageSrcs];
         });
     });
 };
@@ -88,9 +93,9 @@ const writeToDesktop = async (id) => {
     for (let postUrl of postUrls) {
         const srcs = await getImageSrcFromUrl(postUrl);
 
-        for (let src of srcs) {
+        for (let { src, type } of srcs) {
             const fetched = await fetch(src);
-            const writableStream = fs.createWriteStream(path.join(dir, `${randomUUID()}.jpg`));
+            const writableStream = fs.createWriteStream(path.join(dir, `${randomUUID()}.${type}`));
 
             await fetched.body.pipeTo(new WritableStream({
                 write(chunk) {

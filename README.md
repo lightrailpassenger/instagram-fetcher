@@ -1,6 +1,8 @@
 # instagram-fetcher
 Instagram photo fetcher
 
+** Warnings: Please respect copyright issues **
+
 ## Usage
 
 ```node
